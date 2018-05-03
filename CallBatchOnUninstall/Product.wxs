@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
+  <Product Id="{24E87112-0A11-45A6-99BB-A94A5D39B8C0}" Name="! Call a batch script on the uninstall" Language="1033" Version="1.0.0.0" Manufacturer="My Company" UpgradeCode="{90EA09BE-73E7-45EA-858D-2AFF290F60D0}">
+
+    <Package InstallerVersion="200" Compressed="yes" InstallScope="perMachine" Platform="x64" />
+
+    <MajorUpgrade DowngradeErrorMessage="A newer version of [ProductName] is already installed." />
+    <MediaTemplate EmbedCab="yes" />
+
+    <Directory Id="TARGETDIR" Name="SourceDir">
+      <Directory Id="ProgramFiles64Folder">
+        <!-- WiX. Add the manufacturer to the install path
+          https://stackoverflow.com/questions/16946701/wix-installer-how-can-i-show-the-value-of-manufacturer-in-the-install-path/17255735#17255735
+          or use https://stackoverflow.com/questions/11003336/what-is-the-usage-of-targetdir-and-installdir-in-wix/11003825#11003825 -->
+        <Directory Id="ManufacturerFolder" Name="!(bind.property.Manufacturer)">
+          <Directory Id="INSTALLDIR" Name="! Call a batch script on the uninstall"/>
+        </Directory>
+      </Directory>
+    </Directory>
+
+    <Component Id="CMP_Install_something" Directory="INSTALLDIR" Win64="yes" Guid="{E56EE675-8290-46B7-B15A-39F607FCB947}">
+      <File Id="FILE_README_txt" Name="README.txt" Source="README.txt" KeyPath="no" Vital="no" />
+      <!-- Or use CreateFolder to an installation withou any files. -->
+      <!--<CreateFolder Directory="INSTALLDIR"/>-->
+      <File Id="FILE_dummy.bat" Name="dummy.bat" Source="dummy.bat" KeyPath="no" Vital="yes" />
+    </Component>
+
+
+    <!-- !!! Create an external batch file. Copy the source "dummy.bat" to "C:\!00" folder.
+         !!! -->
+    <!-- Use a full paths https://stackoverflow.com/questions/9563820/wix-invoking-batch-file-in-installexecution-sequence/45918334#45918334 -->
+    <CustomAction Id="RunExternalBatchFile" Directory="INSTALLDIR" ExeCommand="C:\!00\dummy.bat" Execute="deferred" Impersonate="no" Return="ignore" />
+
+    <!-- Use ExeCommand="[INSTALLDIR]dummy.bat" https://stackoverflow.com/questions/9563820/wix-invoking-batch-file-in-installexecution-sequence/9578148#9578148 -->
+    <!-- Any whitespaces are allowed in ExeCommand="[INSTALLDIR]dummy.bat" -->
+    <CustomAction Id="RunDeployedBatchFile" Directory="INSTALLDIR" ExeCommand="[INSTALLDIR]dummy.bat" Execute="deferred" Impersonate="no" Return="ignore" />
+
+
+    <InstallExecuteSequence>
+      <Custom Action="RunExternalBatchFile" Before="RemoveFiles">
+        <![CDATA[(NOT UPGRADINGPRODUCTCODE) AND (REMOVE~="ALL")]]>
+      </Custom>
+      <Custom Action="RunDeployedBatchFile" Before="RemoveFiles">
+        <![CDATA[(NOT UPGRADINGPRODUCTCODE) AND (REMOVE~="ALL")]]>
+      </Custom>
+    </InstallExecuteSequence>
+
+    <Feature Id="Install_something" Title="Install our app" Level="1" Absent="disallow">
+      <ComponentRef Id="CMP_Install_something" />
+    </Feature>
+
+  </Product>
+</Wix>
