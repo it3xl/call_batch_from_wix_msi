@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
-  <Product Id="{24E87112-0A11-45A6-99BB-A94A5D39B8C0}" Name="! Call a batch script on the uninstall" Language="1033" Version="1.0.0.0" Manufacturer="My Company" UpgradeCode="{90EA09BE-73E7-45EA-858D-2AFF290F60D0}">
+  <Product Id="{24E87112-0A11-45A6-99BB-A94A5D39B8C0}" Name="! Call a batch script on the uninstall" Language="1033" Version="1.0.0.0" Manufacturer="! call_batch_from_wix_msi project" UpgradeCode="{90EA09BE-73E7-45EA-858D-2AFF290F60D0}">
 
     <Package InstallerVersion="200" Compressed="yes" InstallScope="perMachine" Platform="x64" />
 
